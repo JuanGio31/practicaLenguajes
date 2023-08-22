@@ -13,15 +13,21 @@ public class Analizador {
     private final char SPACE = ' ';
     private ArrayList<Token> tokens;
     private Map<String, TokenEnum> diccionario;
+    private ArrayList<LexError> listError;
 
     public Analizador() {
         this.tokens = new ArrayList<>();
+        this.listError = new ArrayList<>();
         diccionario = new HashMap<>();
         this.getDic();
     }
 
     public ArrayList<Token> getTokens() {
         return tokens;
+    }
+
+    public ArrayList<LexError> getListError() {
+        return listError;
     }
 
     public Map<String, TokenEnum> getDiccionario() {
@@ -56,7 +62,6 @@ public class Analizador {
         int row = 1;
         int col = -1;
 
-        boolean[] acept = new boolean[]{false, false, false, false, false, false, false};
         for (int i = 0; i < entradaChar.length; i++) {
             col++;
             if (entradaChar[i] == SPACE) {
@@ -66,36 +71,92 @@ public class Analizador {
                                     this.diccionario.get(
                                             lexemaTemp.trim()),
                                     lexemaTemp,
-                                    definirPatron(
-                                            lexemaTemp.trim()),
+                                    definirPatron(lexemaTemp.trim()),
                                     row,
                                     col));
                 }
-                lexemaTemp = "";
 
-            }
-            lexemaTemp += entradaChar[i];
-            if (charApertura(entradaChar[i], acept)) {
-                tokens.add(new Token(TokenEnum.OTHER, entradaChar[i] + "", definirPatron(entradaChar[i] + ""), row, col));
-                lexemaTemp = "";
-            }
-
-            switch (lexemaTemp) {
-                case "<=", ">=", "==", "!=", "//" -> {
+                try {
+                    double conv = Double.parseDouble(lexemaTemp);
                     tokens.add(
                             new Token(
-                                    this.diccionario.get(
-                                            lexemaTemp),
+                                    TokenEnum.CONST,
                                     lexemaTemp,
-                                    definirPatron(
-                                            lexemaTemp),
+                                    definirPatron(lexemaTemp.trim()),
                                     row,
                                     col));
-                    lexemaTemp = "";
+                } catch (NumberFormatException e) {
                 }
+                lexemaTemp = "";
+            } else if (entradaChar[i] == '_') {
+                String tmp = "_";
+                int x = 1;
+                while (x + i < entradaChar.length - 1
+                        && entradaChar[x + i] == '_'
+                        || Character.isLetterOrDigit(entradaChar[x + i])
+                        && entradaChar[i + x] != SPACE && entradaChar[i + x] != '\n') {
+                    tmp += entradaChar[i + x];
+                    x++;
+                    col++;
+                }
+                if (tmp.length() > 1 && Character.isLetter(tmp.charAt(1))) {
+                    try {
+                        if (i == 0 || entradaChar[i - 1] == SPACE || entradaChar[i - 1] == '\n') {
+                            tokens.add(
+                                    new Token(
+                                            TokenEnum.ID,
+                                            tmp,
+                                            definirPatron(tmp),
+                                            row,
+                                            col));
+                        }
+                    } catch (IndexOutOfBoundsException e) {
+                    }
+                }
+
+                col = col - tmp.length() + 1;
+            } else if (Character.isLowerCase(entradaChar[i])) {
+                String tmp = entradaChar[i] + "";
+                int x = 1;
+                while (x + i < entradaChar.length - 1
+                        && entradaChar[x + i] == '_'
+                        || Character.isLetterOrDigit(entradaChar[x + i])
+                        && entradaChar[i + x] != SPACE && entradaChar[i + x] != '\n') {
+                    tmp += entradaChar[i + x];
+                    x++;
+                    col++;
+                }
+                if (tmp.length() > 1 && Character.isLetter(tmp.charAt(1))) {
+                    try {
+                        if (i == 0 || entradaChar[i - 1] == SPACE || entradaChar[i - 1] == '\n') {
+                            if (!diccionario.containsKey(tmp)) {
+                                tokens.add(
+                                        new Token(
+                                                TokenEnum.ID,
+                                                tmp,
+                                                definirPatron(tmp),
+                                                row,
+                                                col));
+                            }
+                        }
+                    } catch (IndexOutOfBoundsException e) {
+                    }
+                }
+
+                col = col - tmp.length() + 1;
+            } else if (entradaChar[i] == 39) {
+                addTokenCadena(entradaChar[i], entradaChar, i, col, row);
+                lexemaTemp = "";
+            } else if (entradaChar[i] == 34) {
+                addTokenCadena(entradaChar[i], entradaChar, i, col, row);
+                lexemaTemp = "";
             }
 
-            if (entradaChar[i] == '\n') {
+            lexemaTemp += entradaChar[i];
+            if (charApertura(entradaChar[i])) {
+                tokens.add(new Token(TokenEnum.OTHER, entradaChar[i] + "", definirPatron(entradaChar[i] + ""), row, col));
+                lexemaTemp = "";
+            } else if (entradaChar[i] == '\n') {
                 if (this.diccionario.containsKey(lexemaTemp.trim())) {
                     tokens.add(
                             new Token(
@@ -111,29 +172,78 @@ public class Analizador {
                 col = -1;
                 row++;
             }
+            switch (lexemaTemp) {
+                case "<=", ">=", "==", "!=", "//" -> {
+                    tokens.add(
+                            new Token(
+                                    this.diccionario.get(
+                                            lexemaTemp),
+                                    lexemaTemp,
+                                    definirPatron(
+                                            lexemaTemp),
+                                    row,
+                                    col + 1));
+                    lexemaTemp = "";
+                }
+            }
+
         }
     }
 
-    private boolean charApertura(char c, boolean[] acept) {
+    private void addTokenCadena(char signo, char[] cadena, int indice, int col, int row) {
+        String tmp = signo + "";
+        int x = 1;
+        while (x + indice < cadena.length - 1 && cadena[indice + x] != '\n' && cadena[indice + x] != signo) {
+            tmp += cadena[signo + x];
+            x++;
+            col++;
+        }
+
+        try {
+            if (cadena[x + indice] == signo) {
+                tmp += cadena[indice + x];
+                col++;
+
+                if (indice == 0 || cadena[indice - 1] == SPACE || cadena[indice - 1] == '\n') {
+                    tokens.add(
+                            new Token(
+                                    TokenEnum.CONST,
+                                    "Cadena",
+                                    definirPatron("cadena"),
+                                    row,
+                                    col));
+                } else {
+                    listError.add(new LexError(tmp, row, col));
+                }
+            } else {
+                listError.add(new LexError(tmp, row, col));
+            }
+        } catch (IndexOutOfBoundsException e) {
+            listError.add(new LexError(tmp, row, col));
+        }
+        col -= tmp.length();
+    }
+
+    private boolean charApertura(char c) {
         boolean tmp = false;
         switch (c) {
             case '(' -> {
-                tmp = acept[0] = true;
+                tmp = true;
             }
             case ')' -> {
-                tmp = acept[1] = true;
+                tmp = true;
             }
             case '{' -> {
-                tmp = acept[2] = true;
+                tmp = true;
             }
             case '}' -> {
-                tmp = acept[3] = true;
+                tmp = true;
             }
             case '[' -> {
-                tmp = acept[4] = true;
+                tmp = true;
             }
             case ']' -> {
-                tmp = acept[5] = true;
+                tmp = true;
             }
         }
         return tmp;
@@ -154,7 +264,7 @@ public class Analizador {
                 return str;
             }
             default -> {
-                return "[_|A-z]+[\\d]*";
+                return "[A-z]+[\\d]*";
             }
         }
     }

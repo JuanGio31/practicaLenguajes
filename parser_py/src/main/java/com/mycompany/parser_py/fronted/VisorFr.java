@@ -56,6 +56,13 @@ public class VisorFr extends javax.swing.JFrame {
                         || e.getKeyCode() == KeyEvent.VK_SPACE) {
                     hacerAnalisis();
                 }
+                if (e.getKeyCode() == KeyEvent.VK_CONTROL) {
+                    analizador.getListError().clear();
+                    hacerAnalisis();
+                    for (int i = 0; i < analizador.getListError().size(); i++) {
+                        System.out.println(analizador.getListError().get(i).toString());
+                    }
+                }
             }
 
             @Override
