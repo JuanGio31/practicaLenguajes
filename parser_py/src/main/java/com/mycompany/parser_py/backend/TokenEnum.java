@@ -13,5 +13,5 @@ public enum TokenEnum {
     LOGIC,
     ASSIGNMENT,
     CONST,
-    COMMENT
+    COMMENT, ERROR
 }

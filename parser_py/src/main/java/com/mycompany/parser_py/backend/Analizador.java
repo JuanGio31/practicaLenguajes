@@ -56,13 +56,14 @@ public class Analizador {
         return textoLimpio;
     }
 
-    public void escanear(String entrada) {
+    public void scan(String entrada) {
         char[] entradaChar = limpiarTexto(entrada).toCharArray();
         String lexemaTemp = "";
         int row = 1;
         int col = -1;
 
-        for (int i = 0; i < entradaChar.length; i++) {
+        int i = 0;
+        while (i < entradaChar.length) {
             col++;
             if (entradaChar[i] == SPACE) {
                 if (this.diccionario.containsKey(lexemaTemp.trim())) {
@@ -74,18 +75,19 @@ public class Analizador {
                                     definirPatron(lexemaTemp.trim()),
                                     row,
                                     col));
-                }
-
-                try {
-                    double conv = Double.parseDouble(lexemaTemp);
-                    tokens.add(
-                            new Token(
-                                    TokenEnum.CONST,
-                                    lexemaTemp,
-                                    definirPatron(lexemaTemp.trim()),
-                                    row,
-                                    col));
-                } catch (NumberFormatException e) {
+                } else {
+                    try {
+                        double conv = Double.parseDouble(lexemaTemp);
+                        tokens.add(
+                                new Token(
+                                        TokenEnum.CONST,
+                                        lexemaTemp,
+                                        definirPatron(lexemaTemp.trim()),
+                                        row,
+                                        col));
+                    } catch (NumberFormatException e) {
+                        listError.add(new LexError(lexemaTemp, row, col));
+                    }
                 }
                 lexemaTemp = "";
             } else if (entradaChar[i] == '_') {
@@ -111,9 +113,9 @@ public class Analizador {
                                             col));
                         }
                     } catch (IndexOutOfBoundsException e) {
+                        listError.add(new LexError(lexemaTemp, row, col));
                     }
                 }
-
                 col = col - tmp.length() + 1;
             } else if (Character.isLowerCase(entradaChar[i])) {
                 String tmp = entradaChar[i] + "";
@@ -145,10 +147,111 @@ public class Analizador {
 
                 col = col - tmp.length() + 1;
             } else if (entradaChar[i] == 39) {
-                addTokenCadena(entradaChar[i], entradaChar, i, col, row);
+                String tmp = entradaChar[i] + "";
+                int x = 1;
+                while (x + i < entradaChar.length - 1 && entradaChar[i + x] != '\n' && entradaChar[i + x] != 39) {
+                    tmp += entradaChar[i + x];
+                    x++;
+                    col++;
+                }
+
+                try {
+                    if (entradaChar[x + i] == 39) {
+                        tmp += entradaChar[i + x];
+                        x++;
+                        col++;
+
+                        if (i == 0 || entradaChar[i - 1] == SPACE || entradaChar[i - 1] == '\n') {
+                            tokens.add(
+                                    new Token(
+                                            TokenEnum.CONST,
+                                            tmp,
+                                            definirPatron("cadena"),
+                                            row,
+                                            col));
+                        } else {
+                            listError.add(new LexError(tmp, row, col));
+                        }
+                    } else {
+                        listError.add(new LexError(tmp, row, col));
+                    }
+                } catch (IndexOutOfBoundsException e) {
+                    listError.add(new LexError(tmp, row, col));
+                }
+                i = i + x - 1;
+                //col -= tmp.length();
                 lexemaTemp = "";
             } else if (entradaChar[i] == 34) {
-                addTokenCadena(entradaChar[i], entradaChar, i, col, row);
+                String tmp = entradaChar[i] + "";
+                int x = 1;
+                while (x + i < entradaChar.length - 1 && entradaChar[i + x] != '\n' && entradaChar[i + x] != 34) {
+                    tmp += entradaChar[i + x];
+                    x++;
+                    col++;
+                }
+
+                try {
+                    if (entradaChar[x + i] == 34) {
+                        tmp += entradaChar[i + x];
+                        x++;
+                        col++;
+
+                        if (i == 0 || entradaChar[i - 1] == SPACE || entradaChar[i - 1] == '\n') {
+                            tokens.add(
+                                    new Token(
+                                            TokenEnum.CONST,
+                                            tmp,
+                                            definirPatron("cadena"),
+                                            row,
+                                            col));
+
+                        } else {
+                            listError.add(new LexError(tmp, row, col));
+                        }
+                    } else {
+                        listError.add(new LexError(tmp, row, col));
+                    }
+                } catch (IndexOutOfBoundsException e) {
+                    listError.add(new LexError(tmp, row, col));
+                }
+                i = i + x - 1;
+                //col -= tmp.length();
+                lexemaTemp = "";
+            } else if (entradaChar[i] == '#') {
+                String tmp = entradaChar[i] + "";
+                int x = 1;
+                while (x + i < entradaChar.length - 1 && entradaChar[i + x] != '\n') {
+                    tmp += entradaChar[i + x];
+                    x++;
+                    col++;
+                }
+
+                try {
+                    if (entradaChar[x + i] == '\n') {
+                        tmp += entradaChar[i + x];
+                        x++;
+                        col++;
+
+                        if (i >= 0 && tmp.charAt(tmp.length() - 1) == '\n') {
+                            tokens.add(
+                                    new Token(
+                                            TokenEnum.COMMENT,
+                                            tmp,
+                                            definirPatron("cadena"),
+                                            row,
+                                            col));
+                        } else {
+                            listError.add(new LexError(tmp, row, col));
+                        }
+                    } else {
+                        listError.add(new LexError(tmp, row, col));
+                    }
+                } catch (IndexOutOfBoundsException e) {
+                    listError.add(new LexError(tmp, row, col));
+                }
+                i = i + x;
+                row++;
+                //col -= tmp.length();
                 lexemaTemp = "";
             }
 
@@ -156,21 +259,6 @@ public class Analizador {
             if (charApertura(entradaChar[i])) {
                 tokens.add(new Token(TokenEnum.OTHER, entradaChar[i] + "", definirPatron(entradaChar[i] + ""), row, col));
                 lexemaTemp = "";
-            } else if (entradaChar[i] == '\n') {
-                if (this.diccionario.containsKey(lexemaTemp.trim())) {
-                    tokens.add(
-                            new Token(
-                                    this.diccionario.get(
-                                            lexemaTemp.trim()),
-                                    lexemaTemp,
-                                    definirPatron(
-                                            lexemaTemp.trim()),
-                                    row,
-                                    col));
-                }
-                lexemaTemp = "";
-                col = -1;
-                row++;
             }
             switch (lexemaTemp) {
                 case "<=", ">=", "==", "!=", "//" -> {
@@ -186,42 +274,24 @@ public class Analizador {
                     lexemaTemp = "";
                 }
             }
-
-        }
-    }
-
-    private void addTokenCadena(char signo, char[] cadena, int indice, int col, int row) {
-        String tmp = signo + "";
-        int x = 1;
-        while (x + indice < cadena.length - 1 && cadena[indice + x] != '\n' && cadena[indice + x] != signo) {
-            tmp += cadena[signo + x];
-            x++;
-            col++;
-        }
-
-        try {
-            if (cadena[x + indice] == signo) {
-                tmp += cadena[indice + x];
-                col++;
-
-                if (indice == 0 || cadena[indice - 1] == SPACE || cadena[indice - 1] == '\n') {
+            if (entradaChar[i] == '\n') {
+                if (this.diccionario.containsKey(lexemaTemp.trim())) {
                     tokens.add(
                             new Token(
-                                    TokenEnum.CONST,
-                                    "Cadena",
-                                    definirPatron("cadena"),
+                                    this.diccionario.get(
+                                            lexemaTemp.trim()),
+                                    lexemaTemp,
+                                    definirPatron(
+                                            lexemaTemp.trim()),
                                     row,
                                     col));
-                } else {
-                    listError.add(new LexError(tmp, row, col));
                 }
-            } else {
-                listError.add(new LexError(tmp, row, col));
+                lexemaTemp = "";
+                col = -1;
+                row++;
             }
-        } catch (IndexOutOfBoundsException e) {
-            listError.add(new LexError(tmp, row, col));
+            i++;
         }
-        col -= tmp.length();
     }
 
     private boolean charApertura(char c) {

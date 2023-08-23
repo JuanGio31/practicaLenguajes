@@ -135,4 +135,22 @@ public class FilesControl {
         File file = new File(file_name);
         file.delete();
     }
+
+    /**
+     * Elimina los archivos con una determinada extensión de una carpeta
+     *
+     * @param path Carpeta de la cual eliminar los archivos
+     * @param extension Extensión de los archivos a eliminar
+     */
+    public void eliminarPorExtension(String path, final String extension) {
+        File[] archivos = new File(path).listFiles((File archivo) -> {
+            if (archivo.isFile()) {
+                return archivo.getName().endsWith('.' + extension);
+            }
+            return false;
+        });
+        for (File archivo : archivos) {
+            archivo.delete();
+        }
+    }
 }

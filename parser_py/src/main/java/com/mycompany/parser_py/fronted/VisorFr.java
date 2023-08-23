@@ -1,7 +1,6 @@
 package com.mycompany.parser_py.fronted;
 
 import com.mycompany.parser_py.backend.Analizador;
-import com.mycompany.parser_py.backend.Token;
 import com.mycompany.parser_py.backend.TokenEnum;
 import com.mycompany.parser_py.backend.utilidades.FilesControl;
 import com.mycompany.parser_py.backend.utilidades.Grafico;
@@ -53,16 +52,19 @@ public class VisorFr extends javax.swing.JFrame {
             @Override
             public void keyPressed(KeyEvent e) {
                 if (e.getKeyCode() == KeyEvent.VK_ENTER
-                        || e.getKeyCode() == KeyEvent.VK_SPACE) {
-                    hacerAnalisis();
-                }
-                if (e.getKeyCode() == KeyEvent.VK_CONTROL) {
+                        || e.getKeyCode() == KeyEvent.VK_SPACE
+                        || e.getKeyCode() == KeyEvent.VK_BACK_SPACE) {
                     analizador.getListError().clear();
                     hacerAnalisis();
-                    for (int i = 0; i < analizador.getListError().size(); i++) {
-                        System.out.println(analizador.getListError().get(i).toString());
-                    }
                 }
+                erLabel.setText("Errores: " + analizador.getListError().size());
+//                if (e.getKeyCode() == KeyEvent.VK_CONTROL) {
+//                    analizador.getListError().clear();
+//                    hacerAnalisis();
+//                    for (int i = 0; i < analizador.getListError().size(); i++) {
+//                        System.out.println(analizador.getListError().get(i).toString());
+//                    }
+//                }
             }
 
             @Override
@@ -93,37 +95,60 @@ public class VisorFr extends javax.swing.JFrame {
     }
 
     private void colorear(String entrada) throws BadLocationException {
-        String[] matrix = entrada.split(" ");
+        char[] matrix = entrada.trim().toCharArray();
+        String buffer = "";
         areaTexto.setText("");
 
-        for (String matrix1 : matrix) {
-            SimpleAttributeSet attributeSet = new SimpleAttributeSet();
-            for (Token token : analizador.getTokens()) {
-                if (null != analizador.getDiccionario().get(token.getLexema())) {
-                    switch (analizador.getDiccionario().get(token.getLexema())) {
-                        case KW ->
-                            textoColor(attributeSet, areaTexto, matrix1, new Color(166, 96, 206));
-                        case ARITHMETIC, COMPARISON, LOGIC, ASSIGNMENT ->
-                            textoColor(attributeSet, areaTexto, matrix1, Color.CYAN);
-                        case OTHER -> {
-                            textoColor(attributeSet, areaTexto, matrix1, Color.green);
-                        }
-                        case ID -> {
-                            textoColor(attributeSet, areaTexto, matrix1, Color.black);
-                        }
-                        case COMMENT -> {
-                            textoColor(attributeSet, areaTexto, matrix1, Color.gray);
-                        }
+        SimpleAttributeSet sm = new SimpleAttributeSet();
+        for (int i = 0; i < matrix.length; i++) {
+            buffer += matrix[i];
+            boolean acept = false;
+
+            for (int j = 0; j < analizador.getTokens().size(); j++) {
+                TokenEnum tk = TokenEnum.ERROR;
+                if (buffer.equals(analizador.getTokens().get(j).getLexema())) {
+                    tk = analizador.getTokens().get(j).getTipo();
+                }
+                switch (tk) {
+                    case KW -> {
+                        textoColor(sm, areaTexto, buffer + " ", new Color(166, 96, 206));
+                        acept = true;
+                        buffer = "";
+                    }
+                    case ARITHMETIC, COMPARISON, LOGIC, ASSIGNMENT -> {
+                        textoColor(sm, areaTexto, buffer + " ", Color.CYAN);
+                        acept = true;
+                        buffer = "";
+                    }
+                    case OTHER -> {
+                        textoColor(sm, areaTexto, buffer + " ", Color.green);
+                        acept = true;
+                        buffer = "";
+                    }
+                    case ID -> {
+                        textoColor(sm, areaTexto, buffer + " ", Color.black);
+                        acept = true;
+                        buffer = "";
+                    }
+                    case COMMENT -> {
+                        textoColor(sm, areaTexto, buffer + " ", Color.gray);
+                        acept = true;
+                        buffer = "";
+                    }
+                    default -> {
+                        acept = false;
+                        buffer += matrix[i];
                     }
                 }
-                break;
             }
-            if (matrix1.equals("\\n")) {
+
+//            if (!acept) {
+//                textoColor(sm, areaTexto, buffer, Color.ORANGE);
+//            }
+            if (matrix[i] == '\n') {
                 areaTexto.getStyledDocument().insertString(
                         areaTexto.getStyledDocument().getLength(),
                         System.getProperty("line.separator"), null);
-            } else {
-                textoColor(attributeSet, areaTexto, matrix1, Color.black);
             }
         }
     }
@@ -132,7 +157,7 @@ public class VisorFr extends javax.swing.JFrame {
         StyleConstants.setForeground(attrs, color);
         try {
             text.getStyledDocument().insertString(
-                    text.getStyledDocument().getLength(), string + " ", attrs);
+                    text.getStyledDocument().getLength(), string, attrs);
         } catch (BadLocationException ex) {
         }
     }
@@ -163,6 +188,7 @@ public class VisorFr extends javax.swing.JFrame {
         jLabel4 = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
         areaTexto = new javax.swing.JTextPane();
+        erLabel = new javax.swing.JLabel();
         graficoPanel = new javax.swing.JPanel();
         jPanel1 = new javax.swing.JPanel();
         btnId = new javax.swing.JLabel();
@@ -173,10 +199,10 @@ public class VisorFr extends javax.swing.JFrame {
         listTk = new javax.swing.JComboBox<>();
         jButton1 = new javax.swing.JButton();
         jButton2 = new javax.swing.JButton();
-        jButton3 = new javax.swing.JButton();
         jLabel7 = new javax.swing.JLabel();
         jScrollPane3 = new javax.swing.JScrollPane();
         textIcon = new javax.swing.JTextPane();
+        jButton3 = new javax.swing.JButton();
         acercaPanel = new javax.swing.JPanel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -350,6 +376,13 @@ public class VisorFr extends javax.swing.JFrame {
 
         jScrollPane1.setViewportView(areaTexto);
 
+        erLabel.setForeground(new java.awt.Color(204, 0, 0));
+        erLabel.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                erLabelMouseClicked(evt);
+            }
+        });
+
         javax.swing.GroupLayout inicioLayout = new javax.swing.GroupLayout(inicio);
         inicio.setLayout(inicioLayout);
         inicioLayout.setHorizontalGroup(
@@ -366,7 +399,9 @@ public class VisorFr extends javax.swing.JFrame {
                         .addGap(18, 18, 18)
                         .addComponent(btnAnalizar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 280, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 280, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(30, 30, 30)
+                        .addComponent(erLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 124, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addGap(14, 14, 14))
         );
         inicioLayout.setVerticalGroup(
@@ -377,7 +412,8 @@ public class VisorFr extends javax.swing.JFrame {
                     .addComponent(btnCargar, javax.swing.GroupLayout.DEFAULT_SIZE, 42, Short.MAX_VALUE)
                     .addGroup(inicioLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                         .addComponent(jLabel4)
-                        .addComponent(btnAnalizar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(btnAnalizar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(erLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 354, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
@@ -505,21 +541,14 @@ public class VisorFr extends javax.swing.JFrame {
         });
         jPanel1.add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(420, 50, -1, -1));
 
-        jButton2.setText("visualizar");
+        jButton2.setBackground(new java.awt.Color(0, 51, 51));
+        jButton2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/ver.png"))); // NOI18N
         jButton2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton2ActionPerformed(evt);
             }
         });
-        jPanel1.add(jButton2, new org.netbeans.lib.awtextra.AbsoluteConstraints(470, 50, -1, -1));
-
-        jButton3.setText("limpiar pantalla");
-        jButton3.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton3ActionPerformed(evt);
-            }
-        });
-        jPanel1.add(jButton3, new org.netbeans.lib.awtextra.AbsoluteConstraints(560, 50, -1, -1));
+        jPanel1.add(jButton2, new org.netbeans.lib.awtextra.AbsoluteConstraints(470, 50, 40, -1));
 
         jLabel7.setFont(new java.awt.Font("Lato", 1, 18)); // NOI18N
         jLabel7.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
@@ -527,6 +556,13 @@ public class VisorFr extends javax.swing.JFrame {
 
         textIcon.setEditable(false);
         jScrollPane3.setViewportView(textIcon);
+
+        jButton3.setText("Limpiar Registros");
+        jButton3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton3ActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout graficoPanelLayout = new javax.swing.GroupLayout(graficoPanel);
         graficoPanel.setLayout(graficoPanelLayout);
@@ -542,14 +578,18 @@ public class VisorFr extends javax.swing.JFrame {
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, graficoPanelLayout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(jLabel7, javax.swing.GroupLayout.PREFERRED_SIZE, 444, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(171, 171, 171))
+                .addGap(18, 18, 18)
+                .addComponent(jButton3)
+                .addGap(26, 26, 26))
         );
         graficoPanelLayout.setVerticalGroup(
             graficoPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(graficoPanelLayout.createSequentialGroup()
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 102, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(24, 24, 24)
-                .addComponent(jLabel7, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(graficoPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel7, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jButton3))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 494, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(0, 35, Short.MAX_VALUE))
@@ -577,7 +617,8 @@ public class VisorFr extends javax.swing.JFrame {
 
     private void hacerAnalisis() {
         analizador.getTokens().clear();
-        analizador.escanear(areaTexto.getText() + "\n");
+        //analizador.escanear(areaTexto.getText() + "\n");
+        analizador.scan(areaTexto.getText() + "\n");
         loadTable();
     }
 
@@ -587,12 +628,6 @@ public class VisorFr extends javax.swing.JFrame {
 
     private void btnAnalizarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAnalizarActionPerformed
         hacerAnalisis();
-        try {
-            colorear(areaTexto.getText() + "\n");
-//System.out.println(areaTexto.getText());
-        } catch (BadLocationException ex) {
-            Logger.getLogger(VisorFr.class.getName()).log(Level.SEVERE, null, ex);
-        }
     }//GEN-LAST:event_btnAnalizarActionPerformed
 
     private void inicioLblMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_inicioLblMouseEntered
@@ -731,8 +766,15 @@ public class VisorFr extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
-        textIcon.setText(" ");
+        control.eliminarPorExtension("example/", "dot");
+        control.eliminarPorExtension("example/", "png");
     }//GEN-LAST:event_jButton3ActionPerformed
+
+    private void erLabelMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_erLabelMouseClicked
+        ErrorDialog error = new ErrorDialog(this, analizador.getListError());
+        error.setLocationRelativeTo(null);
+        error.setVisible(true);
+    }//GEN-LAST:event_erLabelMouseClicked
 
     private void llenarComboBox(TokenEnum tk) {
         listTk.removeAllItems();
@@ -812,6 +854,7 @@ public class VisorFr extends javax.swing.JFrame {
     private javax.swing.JLabel btnComp;
     private javax.swing.JLabel btnId;
     private javax.swing.JLabel btnKw;
+    private javax.swing.JLabel erLabel;
     private javax.swing.JLabel graficoLbl;
     private javax.swing.JPanel graficoPanel;
     private javax.swing.JPanel inicio;

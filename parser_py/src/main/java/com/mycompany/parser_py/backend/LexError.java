@@ -18,7 +18,7 @@ public class LexError {
 
     @Override
     public String toString() {
-        return "LexError{" + "cadenaError=" + cadenaError + ", row=" + row + ", col=" + col + '}';
+        return "* Error: " + cadenaError + ":\t->[" + row + ", " + col + ']';
     }
 
     public String getCadenaError() {
