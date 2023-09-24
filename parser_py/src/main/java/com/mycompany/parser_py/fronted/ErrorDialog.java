@@ -1,6 +1,6 @@
 package com.mycompany.parser_py.fronted;
 
-import com.mycompany.parser_py.backend.LexError;
+import com.mycompany.parser_py.backend.ErrorLexico;
 import java.util.ArrayList;
 
 /**
@@ -10,12 +10,12 @@ import java.util.ArrayList;
  */
 public class ErrorDialog extends javax.swing.JDialog {
 
-    private ArrayList<LexError> tokens;
+    private ArrayList<ErrorLexico> tokens;
 
     /**
      * Creates new form ErrorDialog
      */
-    public ErrorDialog(java.awt.Frame parent, ArrayList<LexError> tokens) {
+    public ErrorDialog(java.awt.Frame parent, ArrayList<ErrorLexico> tokens) {
         super(parent, true);
         initComponents();
         this.tokens = tokens;

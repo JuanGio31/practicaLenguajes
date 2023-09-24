@@ -51,13 +51,14 @@ public class VisorFr extends javax.swing.JFrame {
 
             @Override
             public void keyPressed(KeyEvent e) {
-                if (e.getKeyCode() == KeyEvent.VK_ENTER
-                        || e.getKeyCode() == KeyEvent.VK_SPACE
-                        || e.getKeyCode() == KeyEvent.VK_BACK_SPACE) {
-                    analizador.getListError().clear();
-                    hacerAnalisis();
-                }
-                erLabel.setText("Errores: " + analizador.getListError().size());
+//                if (e.getKeyCode() == KeyEvent.VK_ENTER
+//                        || e.getKeyCode() == KeyEvent.VK_SPACE
+//                        || e.getKeyCode() == KeyEvent.VK_BACK_SPACE) {
+//                    analizador.getListError().clear();
+//                    hacerAnalisis();
+//                }
+//                erLabel.setText("Errores: " + analizador.getListError().size());
+
 //                if (e.getKeyCode() == KeyEvent.VK_CONTROL) {
 //                    analizador.getListError().clear();
 //                    hacerAnalisis();
@@ -69,6 +70,13 @@ public class VisorFr extends javax.swing.JFrame {
 
             @Override
             public void keyReleased(KeyEvent e) {
+                if (e.getKeyCode() == KeyEvent.VK_ENTER
+                        || e.getKeyCode() == KeyEvent.VK_SPACE
+                        || e.getKeyCode() == KeyEvent.VK_BACK_SPACE) {
+                    analizador.getListError().clear();
+                    hacerAnalisis();
+                }
+                erLabel.setText("Errores: " + analizador.getListError().size());
             }
         });
     }
@@ -199,6 +207,7 @@ public class VisorFr extends javax.swing.JFrame {
         listTk = new javax.swing.JComboBox<>();
         jButton1 = new javax.swing.JButton();
         jButton2 = new javax.swing.JButton();
+        jButton4 = new javax.swing.JButton();
         jLabel7 = new javax.swing.JLabel();
         jScrollPane3 = new javax.swing.JScrollPane();
         textIcon = new javax.swing.JTextPane();
@@ -374,6 +383,8 @@ public class VisorFr extends javax.swing.JFrame {
         jLabel4.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         jLabel4.setText("  ");
 
+        areaTexto.setBackground(new java.awt.Color(51, 51, 51));
+        areaTexto.setCaretColor(new java.awt.Color(51, 51, 51));
         jScrollPane1.setViewportView(areaTexto);
 
         erLabel.setForeground(new java.awt.Color(204, 0, 0));
@@ -550,6 +561,14 @@ public class VisorFr extends javax.swing.JFrame {
         });
         jPanel1.add(jButton2, new org.netbeans.lib.awtextra.AbsoluteConstraints(470, 50, 40, -1));
 
+        jButton4.setText("jButton4");
+        jButton4.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton4ActionPerformed(evt);
+            }
+        });
+        jPanel1.add(jButton4, new org.netbeans.lib.awtextra.AbsoluteConstraints(650, 50, -1, -1));
+
         jLabel7.setFont(new java.awt.Font("Lato", 1, 18)); // NOI18N
         jLabel7.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel7.setText("TIPO DE TOKEN");
@@ -618,7 +637,11 @@ public class VisorFr extends javax.swing.JFrame {
     private void hacerAnalisis() {
         analizador.getTokens().clear();
         //analizador.escanear(areaTexto.getText() + "\n");
-        analizador.scan(areaTexto.getText() + "\n");
+        try {
+            analizador.scan(areaTexto.getText() + "\n");
+        } catch (ArrayIndexOutOfBoundsException e) {
+            System.out.println("error ->");
+        }
         loadTable();
     }
 
@@ -776,6 +799,10 @@ public class VisorFr extends javax.swing.JFrame {
         error.setVisible(true);
     }//GEN-LAST:event_erLabelMouseClicked
 
+    private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
+        
+    }//GEN-LAST:event_jButton4ActionPerformed
+
     private void llenarComboBox(TokenEnum tk) {
         listTk.removeAllItems();
         for (int i = 0; i < analizador.getTokens().size(); i++) {
@@ -862,6 +889,7 @@ public class VisorFr extends javax.swing.JFrame {
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
+    private javax.swing.JButton jButton4;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel7;
     private javax.swing.JPanel jPanel1;

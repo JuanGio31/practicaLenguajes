@@ -16,10 +16,10 @@ public class Token {
     /**
      * Metodo constructor
      *
-     * @param tipo tipo de token
-     * @param lexema palabra formada
-     * @param patron patron del lexema
-     * @param fila fila donde se ubica el token
+     * @param tipo    tipo de token
+     * @param lexema  palabra formada
+     * @param patron  patron del lexema
+     * @param fila    fila donde se ubica el token
      * @param columna columna donde se ubica el token
      */
     public Token(TokenEnum tipo, String lexema, String patron, int fila, int columna) {
@@ -28,6 +28,17 @@ public class Token {
         this.patron = patron;
         this.fila = fila;
         this.columna = columna;
+    }
+
+    @Override
+    public String toString() {
+        return "Token{" +
+                "tipo=" + tipo +
+                ", lexema='" + lexema + '\'' +
+                ", fila=" + fila +
+                ", columna=" + columna +
+                ", patron='" + patron + '\'' +
+                '}';
     }
 
     public TokenEnum getTipo() {
