@@ -45,7 +45,7 @@ public class Colorear {
             case CONST -> Color.red;
             case ARITHMETIC, ASSIGNMENT, LOGIC, COMPARISON -> Color.cyan;
             case COMMENT -> Color.LIGHT_GRAY;
-            case OTHER -> Color.green;
+            case OTHER, BR_A, BR_C, BRACES_A, BRACES_C, PAR_A, PAR_C -> Color.green;
             default -> Color.darkGray;
         };
     }

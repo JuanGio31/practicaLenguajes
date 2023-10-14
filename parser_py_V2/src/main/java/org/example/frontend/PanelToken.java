@@ -34,21 +34,23 @@ public final class PanelToken extends javax.swing.JPanel {
     }
 
     public void loadTable() {
-        String[] nombreColumnas = new String[]{"Token", "Patron", "Lexema", "Linea", "Columna"};
+        String[] columnName = new String[]{"Token", "Patron", "Lexema", "Linea", "Columna"};
         modelo = new DefaultTableModel();
-        modelo.setColumnIdentifiers(nombreColumnas);
+        modelo.setColumnIdentifiers(columnName);
         while (modelo.getRowCount() > 0) {
             modelo.removeRow(0);
         }
 
-        for (int i = 0; i < tokens.size(); i++) {
-            if (tokens.get(i).getTipo() != TokenEnum.ERROR) {
+        for (Token token : tokens) {
+            if (token.getTipo() != TokenEnum.ERROR && token.getTipo()
+                    != TokenEnum.IDENT && token.getTipo()
+                    != TokenEnum.LINE_TERMINATOR) {
                 Object[] tmp = new Object[5];
-                tmp[0] = tokens.get(i).getTipo();
-                tmp[1] = tokens.get(i).getPatron();
-                tmp[2] = tokens.get(i).getLexema();
-                tmp[3] = tokens.get(i).getFila();
-                tmp[4] = tokens.get(i).getColumna();
+                tmp[0] = token.getTipo();
+                tmp[1] = token.getPatron();
+                tmp[2] = token.getLexema();
+                tmp[3] = token.getFila();
+                tmp[4] = token.getColumna();
                 modelo.addRow(tmp);
             }
         }
@@ -56,19 +58,19 @@ public final class PanelToken extends javax.swing.JPanel {
     }
 
     public void loadTable1() {
-        String[] nombreColumnas = new String[]{"Token", "Linea", "Columna"};
+        String[] columnName = new String[]{"Token", "Linea", "Columna"};
         modelo = new DefaultTableModel();
-        modelo.setColumnIdentifiers(nombreColumnas);
+        modelo.setColumnIdentifiers(columnName);
         while (modelo.getRowCount() > 0) {
             modelo.removeRow(0);
         }
 
-        for (int i = 0; i < tokens.size(); i++) {
-            if (tokens.get(i).getTipo() == TokenEnum.ERROR) {
+        for (Token token : tokens) {
+            if (token.getTipo() == TokenEnum.ERROR) {
                 Object[] tmp = new Object[3];
-                tmp[0] = tokens.get(i).getTipo();
-                tmp[1] = tokens.get(i).getFila();
-                tmp[2] = tokens.get(i).getColumna();
+                tmp[0] = token.getTipo();
+                tmp[1] = token.getFila();
+                tmp[2] = token.getColumna();
                 modelo.addRow(tmp);
             }
         }
@@ -82,31 +84,13 @@ public final class PanelToken extends javax.swing.JPanel {
         jScrollPane1 = new javax.swing.JScrollPane();
         tablaTk = new javax.swing.JTable();
 
-        tablaTk.setModel(new javax.swing.table.DefaultTableModel(
-                new Object[][]{
-                        {null, null, null, null},
-                        {null, null, null, null},
-                        {null, null, null, null},
-                        {null, null, null, null}
-                },
-                new String[]{
-                        "Title 1", "Title 2", "Title 3", "Title 4"
-                }
-        ));
+        tablaTk.setModel(new javax.swing.table.DefaultTableModel(new Object[][]{{null, null, null, null}, {null, null, null, null}, {null, null, null, null}, {null, null, null, null}}, new String[]{"Title 1", "Title 2", "Title 3", "Title 4"}));
         jScrollPane1.setViewportView(tablaTk);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
-        layout.setHorizontalGroup(
-                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 338, Short.MAX_VALUE)
-        );
-        layout.setVerticalGroup(
-                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(layout.createSequentialGroup()
-                                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 596, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(0, 0, Short.MAX_VALUE))
-        );
+        layout.setHorizontalGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING).addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 338, Short.MAX_VALUE));
+        layout.setVerticalGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING).addGroup(layout.createSequentialGroup().addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 596, javax.swing.GroupLayout.PREFERRED_SIZE).addGap(0, 0, Short.MAX_VALUE)));
     }// </editor-fold>//GEN-END:initComponents
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

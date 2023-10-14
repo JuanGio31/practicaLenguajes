@@ -17,7 +17,8 @@ LetterOrDigitOrScript = [A-Za-z0-9_]
 D=[0-9]
 LineTerminator = \r|\n|\r\n
 InputCharacter = [^\r\n]
-WhiteSpace = [ \t\r]
+WhiteSpace = [\t\r]
+Indentacion = [ ]
 
 /* comments */
 comentario = "#" {InputCharacter}* {LineTerminator}?
@@ -30,9 +31,10 @@ simple = "\'" {InputCharacter}* "\'"
     return new Token();
 %eofval}
 
+
 %%
+
 //lexical rules
-var |
 as |
 assert |
 break |
@@ -64,12 +66,13 @@ while |
 with |
 yield {return new Token(TokenEnum.KW, yytext(), "KW", yyline + 1, yycolumn + 1);}
 
-"(" |
-")" |
-"[" |
-"]" |
-"{" |
-"}" |
+"(" {return new Token(TokenEnum.PAR_A, yytext(), yytext(), yyline + 1, yycolumn + 1);}
+")" {return new Token(TokenEnum.PAR_C, yytext(), yytext(), yyline + 1, yycolumn + 1);}
+"[" {return new Token(TokenEnum.BR_A, yytext(), yytext(), yyline + 1, yycolumn + 1);}
+"]" {return new Token(TokenEnum.BR_C, yytext(), yytext(), yyline + 1, yycolumn + 1);}
+"{" {return new Token(TokenEnum.BRACES_A, yytext(), yytext(), yyline + 1, yycolumn + 1);}
+"}" {return new Token(TokenEnum.BRACES_C, yytext(), yytext(), yyline + 1, yycolumn + 1);}
+
 "," |
 "." |
 ";" |
@@ -104,8 +107,14 @@ not {return new Token(TokenEnum.LOGIC, yytext(),yytext(), yyline + 1 , yycolumn 
 {doble} {return new Token(TokenEnum.CONST, yytext(), "\\w", yyline + 1, yycolumn + 1);}
 {simple} {return new Token(TokenEnum.CONST, yytext(), "\\w", yyline + 1, yycolumn + 1);}
 {L}({LetterOrDigitOrScript})* {return new Token(TokenEnum.ID, yytext(), "\\w", yyline + 1, yycolumn + 1);}
-{D}+ |
-{D}+ (("."){D}+)   {return new Token(TokenEnum.CONST, yytext(), "\\d", yyline + 1, yycolumn + 1);}
-{WhiteSpace}+ {/* ignore */}
-{LineTerminator}+ {/* ignore */}
+{D}+ (("."){D}+) |
+{D}+   {return new Token(TokenEnum.CONST, yytext(), "\\d", yyline + 1, yycolumn + 1);}
+{WhiteSpace}+ {/*Ignore*/}
+{Indentacion}+ {
+          String tmp = yytext();
+          if (tmp.length()==4 || tmp.length()==8 || tmp.length()==12){
+              return new Token(TokenEnum.IDENT, yyline + 1, yycolumn + 1);
+          }
+      }
+{LineTerminator}+ {return new Token(TokenEnum.LINE_TERMINATOR, yyline +1, yycolumn +1);}
 [^] {return new Token(TokenEnum.ERROR, yyline + 1, yycolumn + 1);}

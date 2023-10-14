@@ -15,5 +15,10 @@ public enum TokenEnum {
     ASSIGNMENT,
     CONST,
     COMMENT,
+    PAR_A, PAR_C, //parentesis
+    BRACES_A, BRACES_C, //llaves
+    BR_A, BR_C, //corchetes
+    IDENT,
+    LINE_TERMINATOR,
     EOF, ERROR
 }

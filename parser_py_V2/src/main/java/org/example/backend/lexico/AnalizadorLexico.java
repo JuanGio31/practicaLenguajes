@@ -25,6 +25,12 @@ public class AnalizadorLexico {
             tokens.add(tk);
             tk = lex.yylex();
         }
+
+        for (int i = 0; i < tokens.size(); i++) {
+            if (tokens.get(i).getTipo() == TokenEnum.IDENT) {
+                System.out.println("Bandera");
+            }
+        }
     }
 
     public List<Token> getTokens() {

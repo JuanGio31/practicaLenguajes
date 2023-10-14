@@ -2,8 +2,6 @@ package org.example.frontend;
 
 import java.awt.Color;
 import java.io.IOException;
-import java.io.Reader;
-import java.io.StringReader;
 
 import javaswingdev.drawer.Drawer;
 import javaswingdev.drawer.DrawerController;
@@ -11,7 +9,7 @@ import javaswingdev.drawer.DrawerController;
 import javax.swing.*;
 
 import org.example.backend.lexico.AnalizadorLexico;
-import org.example.backend.lexico.utilidades.FilesControl;
+import org.example.backend.utilidades.FilesControl;
 import org.example.backend.sintactico.*;
 
 /**
@@ -374,13 +372,14 @@ public class Visor extends javax.swing.JFrame {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        Produccion producer = new Produccion(lexico.getTokens());
-        producer.init();
+        A_Syntax syntax = new A_Syntax(lexico.getTokens());
+        syntax.validate();
+        //producer.init();
         Colorear colorear = new Colorear();
         colorear.colorearEditorTexto(jTextPane1, lexico.getTokens());
         panelTk.loadTable();
         panelError.loadTable1();
-        jTextArea1.setText("Error sintactico -> " + producer.isState());
+        // jTextArea1.setText("Error syntactic -> " + producer.isState());
     }//GEN-LAST:event_analizarBtnActionPerformed
 
     private void cargarBtnMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_cargarBtnMouseEntered
