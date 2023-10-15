@@ -38,7 +38,7 @@ public class FilesControl {
     public String getContenido() {
         String cont = "";
         try {
-            FileNameExtensionFilter filtro = new FileNameExtensionFilter("*.txt", "txt");
+            FileNameExtensionFilter filtro = new FileNameExtensionFilter("*.py", "PY");
             File myObj = seleccionarArchivo(filtro);
             cont = getArchivo(myObj.getAbsolutePath());
         } catch (FileNotFoundException | NullPointerException e) {

@@ -27,6 +27,9 @@ doble = "\"" {InputCharacter}* "\""
 /*comilla simple*/
 simple = "\'" {InputCharacter}* "\'"
 
+//array
+array = "[" {D} ((", "){D})* "]"
+
 %eofval{
     return new Token();
 %eofval}
@@ -101,6 +104,8 @@ not {return new Token(TokenEnum.LOGIC, yytext(),yytext(), yyline + 1 , yycolumn 
 "*=" |
 "-=" |
 "+=" |
+"**=" |
+"%=" |
 "/=" {return new Token(TokenEnum.ASSIGNMENT, yytext(),yytext(), yyline + 1 , yycolumn + 1);}
 
 {comentario} {return new Token(TokenEnum.COMMENT,yytext(), "\\w",yyline + 1, yycolumn + 1);}
@@ -116,5 +121,7 @@ not {return new Token(TokenEnum.LOGIC, yytext(),yytext(), yyline + 1 , yycolumn 
               return new Token(TokenEnum.IDENT, yyline + 1, yycolumn + 1);
           }
       }
-{LineTerminator}+ {return new Token(TokenEnum.LINE_TERMINATOR, yyline +1, yycolumn +1);}
+{LineTerminator}+ {/*ignore*/}
+
+{array} {return new Token(TokenEnum.ARRAY, yytext(), "Array", yyline + 1, yycolumn + 1);}
 [^] {return new Token(TokenEnum.ERROR, yyline + 1, yycolumn + 1);}

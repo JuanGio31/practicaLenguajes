@@ -41,7 +41,7 @@ public class Colorear {
     private static Color getColor(Token token) {
         return switch (token.getTipo()) {
             case KW -> Color.magenta;
-            case ID -> Color.white;
+            case ID -> Color.BLACK;
             case CONST -> Color.red;
             case ARITHMETIC, ASSIGNMENT, LOGIC, COMPARISON -> Color.cyan;
             case COMMENT -> Color.LIGHT_GRAY;

@@ -15,6 +15,7 @@ public enum TokenEnum {
     ASSIGNMENT,
     CONST,
     COMMENT,
+    ARRAY,
     PAR_A, PAR_C, //parentesis
     BRACES_A, BRACES_C, //llaves
     BR_A, BR_C, //corchetes

@@ -99,6 +99,12 @@
             <artifactId>miglayout</artifactId>
             <version>3.7.4</version>
         </dependency>
+        <dependency>
+            <groupId>org.jetbrains</groupId>
+            <artifactId>annotations</artifactId>
+            <version>24.0.1</version>
+            <scope>compile</scope>
+        </dependency>
         <!-- https://mvnrepository.com/artifact/de.jflex/jflex -->
     </dependencies>
 
