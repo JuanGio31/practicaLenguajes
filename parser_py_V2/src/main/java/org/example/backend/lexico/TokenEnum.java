@@ -21,5 +21,5 @@ public enum TokenEnum {
     BR_A, BR_C, //corchetes
     IDENT,
     LINE_TERMINATOR,
-    EOF, ERROR
+    EOF, BOOLEAN, ERROR
 }

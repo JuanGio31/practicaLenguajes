@@ -25,11 +25,11 @@ public class A_Syntax {
 
     public void validate() {
         List<Token> tmp = new ArrayList<>();
+
         while (!values.isEmpty()) {
             if (values.getFirst().getTipo() == TokenEnum.ID) {
                 int row = values.getFirst().getFila();
                 tmp.add(values.getFirst());
-
                 while (!values.isEmpty()) {
                     values.removeFirst();
                     if (values.isEmpty()) {
@@ -40,12 +40,32 @@ public class A_Syntax {
                         break;
                     }
                 }
-                Exp exp = new Exp(errors);
+                Variable exp = new Variable(errors);
                 if (exp.isValid(tmp)) {
                     symbols.addAll(exp.getSymbols());
                 }
                 tmp.clear();
-            } else {
+            } /*else if (values.getFirst().getTipo() == TokenEnum.KW) {
+                switch (values.getFirst().getLexema()) {
+                    case "if" -> {
+                        int row = values.getFirst().getFila();
+
+                        while (!values.isEmpty()) {
+                            if (row == values.getFirst().getFila()) {
+                                tmp.add(values.getFirst());
+                            } else {
+                                break;
+                            }
+                            values.removeFirst();
+                        }
+                        Condicional exp = new Condicional(errors);
+                        if (exp.isValid(tmp)) {
+                            symbols.addAll(exp.getSymbols());
+                        }
+                        tmp.clear();
+                    }
+                }
+            }*/ else {
                 values.removeFirst();
                 tmp.clear();
             }

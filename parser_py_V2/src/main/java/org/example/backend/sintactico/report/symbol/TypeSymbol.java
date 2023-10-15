@@ -3,7 +3,8 @@ package org.example.backend.sintactico.report.symbol;
 public enum TypeSymbol {
     VAR,
     FUNCTION,
-    CONDITIONAL,
+    CONDITION,
+    EXP_CONDITIONAL,
     LOOP,
     METHOD
 }

@@ -3,13 +3,13 @@ package org.example.frontend;
 import java.awt.*;
 
 /**
- *
  * @author giovanic
  */
 public class MenuPanel extends javax.swing.JPanel {
 
-    private final String code2="#2E1437";
-    private final String code1="#948E99";
+    private final String code1 = "#FF0099";
+    private final String code2 = "#493240";
+
     /**
      * Creates new form MenuPanel
      */
@@ -30,12 +30,12 @@ public class MenuPanel extends javax.swing.JPanel {
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 400, Short.MAX_VALUE)
+                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGap(0, 400, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 300, Short.MAX_VALUE)
+                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGap(0, 300, Short.MAX_VALUE)
         );
     }// </editor-fold>//GEN-END:initComponents
 
